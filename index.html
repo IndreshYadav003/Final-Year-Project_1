@@ -1,0 +1,2621 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Wanderlust — Smart Travel Planner</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --sand: #f5efe6;
+        --cream: #faf7f2;
+        --earth: #c8a882;
+        --terracotta: #c4623a;
+        --forest: #2d5016;
+        --midnight: #1a1a2e;
+        --dusk: #16213e;
+        --sky: #0f3460;
+        --gold: #e8b86d;
+        --text: #1a1a2e;
+        --muted: #7a7066;
+        --radius: 16px;
+        --shadow: 0 8px 40px rgba(26, 26, 46, 0.12);
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        font-family: "DM Sans", sans-serif;
+        background: var(--cream);
+        color: var(--text);
+        overflow-x: hidden;
+      }
+
+      /* NAV */
+      nav {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        z-index: 100;
+        background: rgba(250, 247, 242, 0.92);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid rgba(200, 168, 130, 0.2);
+        padding: 0 40px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 64px;
+      }
+      .nav-logo {
+        font-family: "Playfair Display", serif;
+        font-size: 22px;
+        color: var(--midnight);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+      }
+      .nav-logo span {
+        color: var(--terracotta);
+      }
+      .nav-links {
+        display: flex;
+        gap: 32px;
+        list-style: none;
+      }
+      .nav-links a {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--muted);
+        text-decoration: none;
+        transition: color 0.2s;
+        cursor: pointer;
+      }
+      .nav-links a:hover,
+      .nav-links a.active {
+        color: var(--terracotta);
+      }
+      .nav-cta {
+        background: var(--terracotta);
+        color: #fff;
+        border: none;
+        padding: 9px 22px;
+        border-radius: 50px;
+        font-family: "DM Sans", sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .nav-cta:hover {
+        background: #b0562f;
+        transform: translateY(-1px);
+      }
+
+      /* PAGE SYSTEM */
+      .page {
+        display: none;
+        min-height: 100vh;
+      }
+      .page.active {
+        display: block;
+      }
+
+      /* ======================== HOME PAGE ======================== */
+      .hero {
+        min-height: 100vh;
+        background: linear-gradient(
+          160deg,
+          #1a1a2e 0%,
+          #16213e 40%,
+          #0f3460 100%
+        );
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 80px 40px 60px;
+        position: relative;
+        overflow: hidden;
+      }
+      .hero::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      }
+      .hero-content {
+        text-align: center;
+        max-width: 800px;
+        position: relative;
+        z-index: 1;
+      }
+      .hero-eyebrow {
+        display: inline-block;
+        font-size: 12px;
+        font-weight: 500;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: var(--gold);
+        margin-bottom: 20px;
+        padding: 6px 16px;
+        border: 1px solid rgba(232, 184, 109, 0.3);
+        border-radius: 50px;
+      }
+      .hero h1 {
+        font-family: "Playfair Display", serif;
+        font-size: clamp(42px, 7vw, 80px);
+        line-height: 1.05;
+        color: #fff;
+        margin-bottom: 24px;
+      }
+      .hero h1 em {
+        color: var(--gold);
+        font-style: italic;
+      }
+      .hero p {
+        font-size: 18px;
+        color: rgba(255, 255, 255, 0.65);
+        line-height: 1.7;
+        margin-bottom: 40px;
+        max-width: 560px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .hero-actions {
+        display: flex;
+        gap: 16px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      .btn-primary {
+        background: var(--terracotta);
+        color: #fff;
+        border: none;
+        padding: 14px 32px;
+        border-radius: 50px;
+        font-family: "DM Sans", sans-serif;
+        font-size: 15px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.25s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .btn-primary:hover {
+        background: #b0562f;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(196, 98, 58, 0.4);
+      }
+      .btn-outline {
+        background: transparent;
+        color: rgba(255, 255, 255, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        padding: 14px 32px;
+        border-radius: 50px;
+        font-family: "DM Sans", sans-serif;
+        font-size: 15px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.25s;
+      }
+      .btn-outline:hover {
+        border-color: rgba(255, 255, 255, 0.6);
+        color: #fff;
+      }
+      .hero-stats {
+        margin-top: 60px;
+        display: flex;
+        justify-content: center;
+        gap: 48px;
+        flex-wrap: wrap;
+      }
+      .stat {
+        text-align: center;
+      }
+      .stat-num {
+        font-family: "Playfair Display", serif;
+        font-size: 32px;
+        color: var(--gold);
+      }
+      .stat-label {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.45);
+        margin-top: 4px;
+      }
+
+      /* DESTINATIONS SECTION */
+      .section {
+        padding: 80px 40px;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      .section-header {
+        text-align: center;
+        margin-bottom: 48px;
+      }
+      .section-tag {
+        font-size: 11px;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        font-weight: 500;
+        color: var(--terracotta);
+        margin-bottom: 12px;
+        display: block;
+      }
+      .section-title {
+        font-family: "Playfair Display", serif;
+        font-size: clamp(28px, 4vw, 44px);
+        color: var(--midnight);
+        line-height: 1.2;
+      }
+      .section-sub {
+        color: var(--muted);
+        font-size: 16px;
+        margin-top: 12px;
+      }
+
+      .dest-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+      }
+      .dest-card {
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: var(--shadow);
+        cursor: pointer;
+        transition:
+          transform 0.25s,
+          box-shadow 0.25s;
+        position: relative;
+      }
+      .dest-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 16px 48px rgba(26, 26, 46, 0.18);
+      }
+      .dest-card:first-child {
+        grid-row: span 2;
+      }
+      .dest-img {
+        width: 100%;
+        object-fit: cover;
+        background: linear-gradient(135deg, var(--dusk), var(--sky));
+        display: flex;
+        align-items: flex-end;
+        justify-content: flex-start;
+        padding: 24px;
+        color: #fff;
+        min-height: 200px;
+        position: relative;
+      }
+      .dest-card:first-child .dest-img {
+        min-height: 100%;
+        position: absolute;
+        inset: 0;
+      }
+      .dest-card:first-child {
+        min-height: 440px;
+      }
+      .dest-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          to top,
+          rgba(26, 26, 46, 0.8) 0%,
+          transparent 60%
+        );
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 24px;
+      }
+      .dest-emoji {
+        font-size: 48px;
+        position: absolute;
+        top: 20px;
+        right: 20px;
+      }
+      .dest-name {
+        font-family: "Playfair Display", serif;
+        font-size: 22px;
+        color: #fff;
+      }
+      .dest-sub {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.7);
+        margin-top: 4px;
+      }
+      .dest-tag {
+        display: inline-block;
+        margin-top: 8px;
+        background: rgba(232, 184, 109, 0.25);
+        border: 1px solid rgba(232, 184, 109, 0.5);
+        color: var(--gold);
+        font-size: 11px;
+        padding: 4px 10px;
+        border-radius: 50px;
+      }
+      .dest-bg-1 {
+        background: linear-gradient(135deg, #1a1a2e, #c4623a);
+      }
+      .dest-bg-2 {
+        background: linear-gradient(135deg, #2d5016, #0f3460);
+      }
+      .dest-bg-3 {
+        background: linear-gradient(135deg, #16213e, #2d5016);
+      }
+      .dest-bg-4 {
+        background: linear-gradient(135deg, #c4623a, #1a1a2e);
+      }
+      .dest-bg-5 {
+        background: linear-gradient(135deg, #0f3460, #2d5016);
+      }
+
+      /* FEATURES SECTION */
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+      }
+      .feature-card {
+        background: #fff;
+        border-radius: var(--radius);
+        padding: 32px;
+        border: 1px solid rgba(200, 168, 130, 0.15);
+        transition: all 0.25s;
+      }
+      .feature-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow);
+      }
+      .feature-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        background: var(--sand);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        margin-bottom: 16px;
+      }
+      .feature-title {
+        font-weight: 500;
+        font-size: 16px;
+        margin-bottom: 8px;
+      }
+      .feature-desc {
+        font-size: 14px;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      /* ======================== PLANNER PAGE ======================== */
+      .planner-hero {
+        background: var(--midnight);
+        color: #fff;
+        padding: 120px 40px 60px;
+        text-align: center;
+      }
+      .planner-hero h1 {
+        font-family: "Playfair Display", serif;
+        font-size: 48px;
+        margin-bottom: 12px;
+      }
+      .planner-hero p {
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 16px;
+      }
+
+      .planner-container {
+        max-width: 900px;
+        margin: -40px auto 60px;
+        padding: 0 40px;
+      }
+      .planner-card {
+        background: #fff;
+        border-radius: 24px;
+        padding: 40px;
+        box-shadow: 0 20px 60px rgba(26, 26, 46, 0.15);
+      }
+      .step-indicator {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-bottom: 36px;
+      }
+      .step-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--sand);
+        transition: all 0.3s;
+      }
+      .step-dot.active {
+        width: 28px;
+        border-radius: 4px;
+        background: var(--terracotta);
+      }
+      .planner-step {
+        display: none;
+      }
+      .planner-step.active {
+        display: block;
+      }
+      .step-title {
+        font-family: "Playfair Display", serif;
+        font-size: 26px;
+        margin-bottom: 6px;
+      }
+      .step-subtitle {
+        color: var(--muted);
+        font-size: 14px;
+        margin-bottom: 28px;
+      }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .form-group.full {
+        grid-column: span 2;
+      }
+      .form-label {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text);
+      }
+      .form-help {
+        font-size: 12px;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+      .form-input,
+      .form-select,
+      .form-textarea {
+        padding: 12px 16px;
+        border-radius: 12px;
+        border: 1.5px solid rgba(200, 168, 130, 0.3);
+        font-family: "DM Sans", sans-serif;
+        font-size: 14px;
+        color: var(--text);
+        background: var(--cream);
+        transition: border 0.2s;
+        outline: none;
+      }
+      .form-input:focus,
+      .form-select:focus,
+      .form-textarea:focus {
+        border-color: var(--terracotta);
+      }
+      .form-textarea {
+        resize: vertical;
+        min-height: 80px;
+      }
+
+      .interest-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+      }
+      .interest-chip {
+        padding: 10px;
+        border-radius: 12px;
+        border: 1.5px solid rgba(200, 168, 130, 0.3);
+        background: var(--cream);
+        cursor: pointer;
+        text-align: center;
+        font-size: 13px;
+        transition: all 0.2s;
+      }
+      .interest-chip .ic-emoji {
+        font-size: 20px;
+        display: block;
+        margin-bottom: 4px;
+      }
+      .interest-chip:hover,
+      .interest-chip.selected {
+        border-color: var(--terracotta);
+        background: rgba(196, 98, 58, 0.06);
+        color: var(--terracotta);
+      }
+
+      .budget-slider-wrap {
+        margin-top: 8px;
+      }
+      .budget-labels {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 6px;
+      }
+      .budget-display {
+        text-align: center;
+        font-family: "Playfair Display", serif;
+        font-size: 36px;
+        color: var(--terracotta);
+        margin: 12px 0;
+      }
+      input[type="range"] {
+        width: 100%;
+        -webkit-appearance: none;
+        height: 4px;
+        background: var(--sand);
+        border-radius: 2px;
+        outline: none;
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: var(--terracotta);
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(196, 98, 58, 0.4);
+      }
+
+      .step-nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 32px;
+      }
+      .btn-step-next {
+        background: var(--terracotta);
+        color: #fff;
+        border: none;
+        padding: 12px 28px;
+        border-radius: 50px;
+        font-family: "DM Sans", sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .btn-step-next:hover {
+        background: #b0562f;
+        transform: translateX(2px);
+      }
+      .btn-step-back {
+        background: transparent;
+        color: var(--muted);
+        border: 1.5px solid rgba(200, 168, 130, 0.3);
+        padding: 12px 24px;
+        border-radius: 50px;
+        font-family: "DM Sans", sans-serif;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .btn-step-back:hover {
+        border-color: var(--terracotta);
+        color: var(--terracotta);
+      }
+
+      /* ======================== ITINERARY PAGE ======================== */
+      .itinerary-page {
+        background: var(--cream);
+      }
+      .itin-header {
+        background: var(--midnight);
+        padding: 100px 40px 40px;
+        color: #fff;
+      }
+      .itin-header-inner {
+        max-width: 900px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+      }
+      .itin-dest {
+        font-size: 13px;
+        color: var(--gold);
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+      }
+      .itin-title {
+        font-family: "Playfair Display", serif;
+        font-size: 42px;
+      }
+      .itin-meta {
+        display: flex;
+        gap: 16px;
+        margin-top: 12px;
+      }
+      .itin-badge {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 13px;
+        padding: 6px 14px;
+        border-radius: 50px;
+      }
+      .itin-share-btn {
+        background: var(--terracotta);
+        color: #fff;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 50px;
+        font-family: "DM Sans", sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-bottom: 4px;
+      }
+      .itin-share-btn:hover {
+        background: #b0562f;
+      }
+
+      .itin-body {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 40px;
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        gap: 32px;
+      }
+      .itin-days {
+      }
+      .day-card {
+        background: #fff;
+        border-radius: var(--radius);
+        margin-bottom: 16px;
+        border: 1px solid rgba(200, 168, 130, 0.15);
+        overflow: hidden;
+      }
+      .day-header {
+        padding: 16px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .day-header:hover {
+        background: var(--sand);
+      }
+      .day-num {
+        font-family: "Playfair Display", serif;
+        font-size: 18px;
+      }
+      .day-date {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .day-toggle {
+        font-size: 18px;
+        color: var(--muted);
+        transition: transform 0.3s;
+      }
+      .day-body {
+        padding: 0 20px 20px;
+        border-top: 1px solid rgba(200, 168, 130, 0.15);
+        display: none;
+      }
+      .day-body.open {
+        display: block;
+      }
+
+      .timeline {
+        margin-top: 16px;
+      }
+      .tl-item {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 16px;
+      }
+      .tl-time {
+        min-width: 72px;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--muted);
+        padding-top: 3px;
+        text-align: right;
+      }
+      .tl-dot-col {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0;
+      }
+      .tl-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--terracotta);
+        flex-shrink: 0;
+        margin-top: 3px;
+      }
+      .tl-line {
+        width: 1px;
+        flex: 1;
+        background: rgba(200, 168, 130, 0.3);
+        min-height: 20px;
+      }
+      .tl-item:last-child .tl-line {
+        display: none;
+      }
+      .tl-content {
+      }
+      .tl-title {
+        font-weight: 500;
+        font-size: 14px;
+        margin-bottom: 3px;
+      }
+      .tl-desc {
+        font-size: 13px;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+      .tl-chip {
+        display: inline-block;
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 50px;
+        margin-top: 6px;
+        font-weight: 500;
+      }
+      .chip-food {
+        background: rgba(232, 184, 109, 0.2);
+        color: #a07820;
+      }
+      .chip-sight {
+        background: rgba(45, 80, 22, 0.1);
+        color: #2d5016;
+      }
+      .chip-hotel {
+        background: rgba(196, 98, 58, 0.1);
+        color: var(--terracotta);
+      }
+      .chip-travel {
+        background: rgba(15, 52, 96, 0.1);
+        color: var(--sky);
+      }
+
+      .itin-sidebar {
+      }
+      .side-card {
+        background: #fff;
+        border-radius: var(--radius);
+        padding: 24px;
+        margin-bottom: 20px;
+        border: 1px solid rgba(200, 168, 130, 0.15);
+      }
+      .side-card h3 {
+        font-family: "Playfair Display", serif;
+        font-size: 18px;
+        margin-bottom: 16px;
+      }
+      .cost-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        font-size: 14px;
+        border-bottom: 1px solid rgba(200, 168, 130, 0.1);
+      }
+      .cost-row:last-child {
+        border: none;
+        font-weight: 500;
+        font-size: 15px;
+      }
+      .cost-row span:last-child {
+        color: var(--terracotta);
+        font-weight: 500;
+      }
+      .weather-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+      }
+      .weather-day {
+        text-align: center;
+        padding: 10px;
+        background: var(--sand);
+        border-radius: 10px;
+      }
+      .weather-icon {
+        font-size: 22px;
+        display: block;
+        margin-bottom: 4px;
+      }
+      .weather-temp {
+        font-size: 15px;
+        font-weight: 500;
+      }
+      .weather-label {
+        font-size: 11px;
+        color: var(--muted);
+      }
+      .tips-list {
+        list-style: none;
+      }
+      .tips-list li {
+        font-size: 13px;
+        color: var(--muted);
+        padding: 6px 0;
+        border-bottom: 1px solid rgba(200, 168, 130, 0.1);
+        display: flex;
+        gap: 8px;
+        align-items: flex-start;
+        line-height: 1.5;
+      }
+      .tips-list li:last-child {
+        border: none;
+      }
+      .tip-dot {
+        color: var(--terracotta);
+        font-size: 18px;
+        line-height: 1;
+        flex-shrink: 0;
+      }
+
+      /* ======================== DISCOVER PAGE ======================== */
+      .discover-page {
+      }
+      .discover-header {
+        background: linear-gradient(135deg, var(--midnight), var(--sky));
+        padding: 120px 40px 60px;
+        color: #fff;
+      }
+      .discover-header h1 {
+        font-family: "Playfair Display", serif;
+        font-size: 48px;
+        margin-bottom: 12px;
+      }
+      .discover-search {
+        margin-top: 28px;
+        display: flex;
+        gap: 12px;
+        max-width: 600px;
+      }
+      .search-input {
+        flex: 1;
+        padding: 14px 20px;
+        border-radius: 50px;
+        border: none;
+        font-family: "DM Sans", sans-serif;
+        font-size: 15px;
+        outline: none;
+        background: rgba(255, 255, 255, 0.95);
+      }
+      .search-btn {
+        background: var(--terracotta);
+        color: #fff;
+        border: none;
+        padding: 14px 28px;
+        border-radius: 50px;
+        font-family: "DM Sans", sans-serif;
+        font-size: 15px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .search-btn:hover {
+        background: #b0562f;
+      }
+
+      .discover-body {
+        padding: 40px;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      .filter-bar {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 32px;
+        flex-wrap: wrap;
+        overflow-x: auto;
+        padding-bottom: 4px;
+      }
+      .filt-btn {
+        padding: 8px 18px;
+        border-radius: 50px;
+        border: 1.5px solid rgba(200, 168, 130, 0.3);
+        background: #fff;
+        font-family: "DM Sans", sans-serif;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--muted);
+        cursor: pointer;
+        white-space: nowrap;
+        transition: all 0.2s;
+      }
+      .filt-btn.active,
+      .filt-btn:hover {
+        border-color: var(--terracotta);
+        color: var(--terracotta);
+        background: rgba(196, 98, 58, 0.05);
+      }
+      .places-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+      }
+      .place-card {
+        background: #fff;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(26, 26, 46, 0.07);
+        cursor: pointer;
+        transition: all 0.25s;
+        border: 1px solid rgba(200, 168, 130, 0.1);
+      }
+      .place-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow);
+      }
+      .place-thumb {
+        height: 180px;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 64px;
+      }
+      .place-thumb-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          to bottom,
+          transparent,
+          rgba(26, 26, 46, 0.5)
+        );
+      }
+      .place-rating {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        background: rgba(255, 255, 255, 0.95);
+        color: var(--midnight);
+        font-size: 12px;
+        font-weight: 500;
+        padding: 4px 10px;
+        border-radius: 50px;
+      }
+      .place-body {
+        padding: 16px 20px 20px;
+      }
+      .place-name {
+        font-family: "Playfair Display", serif;
+        font-size: 18px;
+        margin-bottom: 4px;
+      }
+      .place-loc {
+        font-size: 13px;
+        color: var(--muted);
+        margin-bottom: 10px;
+        display: flex;
+        gap: 4px;
+        align-items: center;
+      }
+      .place-tags {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+      .place-tag {
+        font-size: 11px;
+        padding: 4px 10px;
+        border-radius: 50px;
+        background: var(--sand);
+        color: var(--muted);
+        font-weight: 500;
+      }
+      .place-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 14px;
+        padding-top: 14px;
+        border-top: 1px solid rgba(200, 168, 130, 0.15);
+      }
+      .place-price {
+        font-size: 13px;
+      }
+      .place-price strong {
+        color: var(--terracotta);
+        font-size: 16px;
+      }
+      .add-trip-btn {
+        background: var(--terracotta);
+        color: #fff;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 50px;
+        font-family: "DM Sans", sans-serif;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .add-trip-btn:hover {
+        background: #b0562f;
+      }
+
+      /* ======================== AUTH PAGE ======================== */
+      .auth-page {
+        min-height: 100vh;
+        display: flex;
+        align-items: stretch;
+      }
+      .auth-left {
+        flex: 1;
+        background: linear-gradient(160deg, var(--midnight), var(--sky));
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 60px;
+        color: #fff;
+        position: relative;
+        overflow: hidden;
+      }
+      .auth-left::after {
+        content: "";
+        position: absolute;
+        width: 400px;
+        height: 400px;
+        border-radius: 50%;
+        background: rgba(232, 184, 109, 0.08);
+        top: -100px;
+        right: -100px;
+      }
+      .auth-left::before {
+        content: "";
+        position: absolute;
+        width: 300px;
+        height: 300px;
+        border-radius: 50%;
+        background: rgba(196, 98, 58, 0.1);
+        bottom: -80px;
+        left: -80px;
+      }
+      .auth-left-content {
+        position: relative;
+        z-index: 1;
+        max-width: 360px;
+      }
+      .auth-left-logo {
+        font-family: "Playfair Display", serif;
+        font-size: 28px;
+        margin-bottom: 40px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .auth-left-logo span {
+        color: var(--gold);
+      }
+      .auth-tagline {
+        font-size: 38px;
+        font-family: "Playfair Display", serif;
+        line-height: 1.2;
+        margin-bottom: 20px;
+      }
+      .auth-tagline em {
+        color: var(--gold);
+        font-style: italic;
+      }
+      .auth-left p {
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 15px;
+        line-height: 1.7;
+      }
+      .auth-right {
+        width: 480px;
+        background: var(--cream);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 60px;
+      }
+      .auth-form-wrap {
+        width: 100%;
+        max-width: 360px;
+      }
+      .auth-tabs {
+        display: flex;
+        gap: 4px;
+        background: var(--sand);
+        border-radius: 12px;
+        padding: 4px;
+        margin-bottom: 28px;
+      }
+      .auth-tab {
+        flex: 1;
+        padding: 9px;
+        border-radius: 9px;
+        border: none;
+        font-family: "DM Sans", sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        background: transparent;
+        color: var(--muted);
+      }
+      .auth-tab.active {
+        background: #fff;
+        color: var(--text);
+        box-shadow: 0 2px 8px rgba(26, 26, 46, 0.08);
+      }
+      .auth-form {
+        display: none;
+      }
+      .auth-form.active {
+        display: block;
+      }
+      .auth-form h2 {
+        font-family: "Playfair Display", serif;
+        font-size: 26px;
+        margin-bottom: 6px;
+      }
+      .auth-form p {
+        color: var(--muted);
+        font-size: 14px;
+        margin-bottom: 24px;
+      }
+      .auth-field {
+        margin-bottom: 14px;
+      }
+      .auth-field label {
+        display: block;
+        font-size: 13px;
+        font-weight: 500;
+        margin-bottom: 6px;
+      }
+      .auth-field input {
+        width: 100%;
+        padding: 12px 16px;
+        border-radius: 12px;
+        border: 1.5px solid rgba(200, 168, 130, 0.3);
+        background: #fff;
+        font-family: "DM Sans", sans-serif;
+        font-size: 14px;
+        outline: none;
+        transition: border 0.2s;
+      }
+      .auth-field input:focus {
+        border-color: var(--terracotta);
+      }
+      .auth-submit {
+        width: 100%;
+        padding: 14px;
+        background: var(--terracotta);
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        font-family: "DM Sans", sans-serif;
+        font-size: 15px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-top: 8px;
+      }
+      .auth-submit:hover {
+        background: #b0562f;
+        transform: translateY(-1px);
+      }
+      .auth-divider {
+        text-align: center;
+        color: var(--muted);
+        font-size: 13px;
+        margin: 16px 0;
+        position: relative;
+      }
+      .auth-divider::before,
+      .auth-divider::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        width: calc(50% - 24px);
+        height: 1px;
+        background: rgba(200, 168, 130, 0.3);
+      }
+      .auth-divider::before {
+        left: 0;
+      }
+      .auth-divider::after {
+        right: 0;
+      }
+      .social-btn {
+        width: 100%;
+        padding: 12px;
+        border: 1.5px solid rgba(200, 168, 130, 0.3);
+        border-radius: 12px;
+        background: #fff;
+        font-family: "DM Sans", sans-serif;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+      }
+      .social-btn:hover {
+        border-color: var(--terracotta);
+      }
+
+      /* TOAST */
+      .toast {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 1000;
+        background: var(--midnight);
+        color: #fff;
+        padding: 14px 20px;
+        border-radius: 12px;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        box-shadow: 0 8px 24px rgba(26, 26, 46, 0.3);
+        transform: translateY(80px);
+        opacity: 0;
+        transition: all 0.3s;
+        max-width: 320px;
+      }
+      .toast.show {
+        transform: translateY(0);
+        opacity: 1;
+      }
+
+      /* RESPONSIVE */
+      @media (max-width: 768px) {
+        nav {
+          padding: 0 20px;
+        }
+        .nav-links {
+          display: none;
+        }
+        .hero {
+          padding: 80px 20px 40px;
+        }
+        .section {
+          padding: 48px 20px;
+        }
+        .dest-grid {
+          grid-template-columns: 1fr;
+        }
+        .dest-card:first-child {
+          min-height: 260px;
+        }
+        .features-grid {
+          grid-template-columns: 1fr;
+        }
+        .form-grid {
+          grid-template-columns: 1fr;
+        }
+        .form-group.full {
+          grid-column: span 1;
+        }
+        .interest-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .itin-body {
+          grid-template-columns: 1fr;
+          padding: 20px;
+        }
+        .itin-header-inner {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 16px;
+        }
+        .places-grid {
+          grid-template-columns: 1fr;
+        }
+        .auth-left {
+          display: none;
+        }
+        .auth-right {
+          width: 100%;
+          padding: 40px 24px;
+        }
+        .planner-container {
+          padding: 0 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <div class="nav-logo" onclick="showPage('home')">
+        ✈️ <span>Wanderlust</span>
+      </div>
+      <ul class="nav-links">
+        <li>
+          <a onclick="showPage('home')" class="active" id="nav-home">Home</a>
+        </li>
+        <li>
+          <a onclick="showPage('discover')" id="nav-discover">Discover</a>
+        </li>
+        <li>
+          <a onclick="showPage('planner')" id="nav-planner">Plan a Trip</a>
+        </li>
+        <li>
+          <a onclick="showPage('itinerary')" id="nav-itinerary">My Trips</a>
+        </li>
+      </ul>
+      <button class="nav-cta" onclick="showPage('auth')">Sign In</button>
+    </nav>
+
+    <!-- ======================== HOME PAGE ======================== -->
+    <div id="page-home" class="page active">
+      <div class="hero">
+        <div class="hero-content">
+          <div class="hero-eyebrow">✦ Smart Travel Planning</div>
+          <h1>Travel <em>Smarter,</em><br />Explore Further</h1>
+          <p>
+            AI-powered trip planning that builds personalized itineraries,
+            estimates costs, and finds hidden gems — all in one place.
+          </p>
+          <div class="hero-actions">
+            <button class="btn-primary" onclick="showPage('planner')">
+              Plan My Trip →
+            </button>
+            <button class="btn-outline" onclick="showPage('discover')">
+              Explore Destinations
+            </button>
+          </div>
+          <div class="hero-stats">
+            <div class="stat">
+              <div class="stat-num">2,400+</div>
+              <div class="stat-label">Destinations</div>
+            </div>
+            <div class="stat">
+              <div class="stat-num">18K</div>
+              <div class="stat-label">Trips planned</div>
+            </div>
+            <div class="stat">
+              <div class="stat-num">4.9★</div>
+              <div class="stat-label">User rating</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <span class="section-tag">✦ Popular Destinations</span>
+          <h2 class="section-title">Where Will You<br />Go Next?</h2>
+        </div>
+        <div class="dest-grid">
+          <div class="dest-card" onclick="showPage('itinerary')">
+            <div
+              class="dest-img dest-bg-1"
+              style="height: 100%; position: absolute; inset: 0"
+            ></div>
+            <div class="dest-overlay">
+              <div class="dest-emoji">🏯</div>
+              <div class="dest-name">Kyoto, Japan</div>
+              <div class="dest-sub">Ancient temples & cherry blossoms</div>
+              <span class="dest-tag">From ₹85,000</span>
+            </div>
+          </div>
+          <div class="dest-card" onclick="showPage('itinerary')">
+            <div
+              class="dest-img dest-bg-2"
+              style="position: relative; height: 200px"
+            >
+              <div class="dest-overlay">
+                <div class="dest-emoji">🗼</div>
+                <div class="dest-name">Paris, France</div>
+                <div class="dest-sub">Romance & haute cuisine</div>
+                <span class="dest-tag">From ₹1,20,000</span>
+              </div>
+            </div>
+          </div>
+          <div class="dest-card" onclick="showPage('itinerary')">
+            <div
+              class="dest-img dest-bg-3"
+              style="position: relative; height: 200px"
+            >
+              <div class="dest-overlay">
+                <div class="dest-emoji">🌴</div>
+                <div class="dest-name">Bali, Indonesia</div>
+                <div class="dest-sub">Temples, rice fields, surf</div>
+                <span class="dest-tag">From ₹45,000</span>
+              </div>
+            </div>
+          </div>
+          <div class="dest-card" onclick="showPage('itinerary')">
+            <div
+              class="dest-img dest-bg-4"
+              style="position: relative; height: 200px"
+            >
+              <div class="dest-overlay">
+                <div class="dest-emoji">🏙️</div>
+                <div class="dest-name">New York, USA</div>
+                <div class="dest-sub">The city that never sleeps</div>
+                <span class="dest-tag">From ₹1,50,000</span>
+              </div>
+            </div>
+          </div>
+          <div class="dest-card" onclick="showPage('itinerary')">
+            <div
+              class="dest-img dest-bg-5"
+              style="position: relative; height: 200px"
+            >
+              <div class="dest-overlay">
+                <div class="dest-emoji">🏔️</div>
+                <div class="dest-name">Ladakh, India</div>
+                <div class="dest-sub">Monasteries & high passes</div>
+                <span class="dest-tag">From ₹22,000</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="background: #fff; padding: 0">
+        <div class="section">
+          <div class="section-header">
+            <span class="section-tag">✦ What We Offer</span>
+            <h2 class="section-title">
+              Everything You Need<br />to Plan Perfectly
+            </h2>
+            <p class="section-sub">
+              From first idea to final booking — we've got it all covered
+            </p>
+          </div>
+          <div class="features-grid">
+            <div class="feature-card">
+              <div class="feature-icon">🗺️</div>
+              <div class="feature-title">Smart Itinerary Builder</div>
+              <div class="feature-desc">
+                Input your budget, duration, and interests — get a day-by-day
+                plan generated instantly.
+              </div>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">💰</div>
+              <div class="feature-title">Cost Estimator</div>
+              <div class="feature-desc">
+                Accurate breakdowns for hotels, transport, food and activities
+                across 100+ cities.
+              </div>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">🌤️</div>
+              <div class="feature-title">Weather Forecasts</div>
+              <div class="feature-desc">
+                Live weather data via OpenWeather API so you always pack right
+                and plan accordingly.
+              </div>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">🤖</div>
+              <div class="feature-title">AI Recommendations</div>
+              <div class="feature-desc">
+                Machine learning that learns your travel style and suggests
+                places you'll actually love.
+              </div>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">🏨</div>
+              <div class="feature-title">Hotel & Flight Hints</div>
+              <div class="feature-desc">
+                Curated accommodation and flight options matched to your budget
+                range.
+              </div>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">💾</div>
+              <div class="feature-title">Save & Share Trips</div>
+              <div class="feature-desc">
+                Store all your trips in your account. Share itineraries with
+                travel companions.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================== PLAN A TRIP ======================== -->
+    <div id="page-planner" class="page">
+      <div class="planner-hero">
+        <h1>Plan Your Dream Trip</h1>
+        <p>Answer a few questions and we'll build your perfect itinerary</p>
+      </div>
+      <div class="planner-container">
+        <div class="planner-card">
+          <div class="step-indicator">
+            <div class="step-dot active" id="dot-0"></div>
+            <div class="step-dot" id="dot-1"></div>
+            <div class="step-dot" id="dot-2"></div>
+            <div class="step-dot" id="dot-3"></div>
+          </div>
+
+          <!-- Step 1 -->
+          <div class="planner-step active" id="step-0">
+            <div class="step-title">Where are you going?</div>
+            <div class="step-subtitle">
+              Tell us about your destination and travel dates
+            </div>
+            <div class="form-grid">
+              <div class="form-group full">
+                <label class="form-label">Destination</label>
+                <input
+                  type="text"
+                  class="form-input"
+                  id="destination-input"
+                  placeholder="Search a city, region, or landmark"
+                  value="Goa, India"
+                />
+                <div class="form-help" id="destination-help">
+                  Use Google Maps autocomplete to choose your trip destination.
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Country</label>
+                <select
+                  class="form-select"
+                  id="country-input"
+                  onchange="handleCountryChange()"
+                ></select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">State / Region</label>
+                <select
+                  class="form-select"
+                  id="state-input"
+                  onchange="handleStateChange()"
+                ></select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Departure From</label>
+                <input
+                  type="text"
+                  class="form-input"
+                  id="departure-input"
+                  placeholder="Your city or airport"
+                  value="Lucknow"
+                />
+                <div class="form-help">
+                  Departure suggestions also use Google Maps when a key is
+                  configured.
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Trip Duration</label>
+                <select class="form-select" id="duration-select">
+                  <option>3 Days / 2 Nights</option>
+                  <option selected>5 Days / 4 Nights</option>
+                  <option>7 Days / 6 Nights</option>
+                  <option>10+ Days</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Start Date</label>
+                <input
+                  type="date"
+                  class="form-input"
+                  id="start-date-input"
+                  value="2026-01-13"
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Number of Travellers</label>
+                <select class="form-select" id="travelers-select">
+                  <option>Solo</option>
+                  <option selected>2 People</option>
+                  <option>3–4 People</option>
+                  <option>Group (5+)</option>
+                </select>
+              </div>
+            </div>
+            <div class="step-nav">
+              <span></span>
+              <button class="btn-step-next" onclick="nextStep(1)">
+                Next: Budget →
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="planner-step" id="step-1">
+            <div class="step-title">What's your budget?</div>
+            <div class="step-subtitle">
+              We'll tailor recommendations to your spending comfort
+            </div>
+            <div class="budget-display" id="budget-display">₹40,000</div>
+            <div class="budget-slider-wrap">
+              <input
+                type="range"
+                min="5000"
+                max="200000"
+                step="1000"
+                value="40000"
+                id="budget-slider"
+                oninput="updateBudget(this.value)"
+              />
+              <div class="budget-labels">
+                <span>₹5,000</span><span>₹2,00,000+</span>
+              </div>
+            </div>
+            <div style="margin-top: 24px">
+              <label
+                class="form-label"
+                style="margin-bottom: 12px; display: block"
+                >Budget Category</label
+              >
+              <div
+                class="interest-grid"
+                style="grid-template-columns: repeat(3, 1fr)"
+              >
+                <div
+                  class="interest-chip selected"
+                  onclick="selectBudget(this)"
+                >
+                  <span class="ic-emoji">🏕️</span> Budget
+                </div>
+                <div class="interest-chip" onclick="selectBudget(this)">
+                  <span class="ic-emoji">🏨</span> Mid-range
+                </div>
+                <div class="interest-chip" onclick="selectBudget(this)">
+                  <span class="ic-emoji">🏰</span> Luxury
+                </div>
+              </div>
+            </div>
+            <div class="step-nav">
+              <button class="btn-step-back" onclick="nextStep(0)">
+                ← Back
+              </button>
+              <button class="btn-step-next" onclick="nextStep(2)">
+                Next: Interests →
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="planner-step" id="step-2">
+            <div class="step-title">What do you love?</div>
+            <div class="step-subtitle">
+              Select all that interest you — we'll prioritize them in your
+              itinerary
+            </div>
+            <div class="interest-grid">
+              <div
+                class="interest-chip selected"
+                onclick="this.classList.toggle('selected')"
+              >
+                <span class="ic-emoji">🏖️</span> Beaches
+              </div>
+              <div
+                class="interest-chip"
+                onclick="this.classList.toggle('selected')"
+              >
+                <span class="ic-emoji">🏛️</span> History
+              </div>
+              <div
+                class="interest-chip selected"
+                onclick="this.classList.toggle('selected')"
+              >
+                <span class="ic-emoji">🍜</span> Food
+              </div>
+              <div
+                class="interest-chip"
+                onclick="this.classList.toggle('selected')"
+              >
+                <span class="ic-emoji">🎭</span> Culture
+              </div>
+              <div
+                class="interest-chip"
+                onclick="this.classList.toggle('selected')"
+              >
+                <span class="ic-emoji">🏔️</span> Adventure
+              </div>
+              <div
+                class="interest-chip selected"
+                onclick="this.classList.toggle('selected')"
+              >
+                <span class="ic-emoji">📸</span> Photography
+              </div>
+              <div
+                class="interest-chip"
+                onclick="this.classList.toggle('selected')"
+              >
+                <span class="ic-emoji">🛍️</span> Shopping
+              </div>
+              <div
+                class="interest-chip"
+                onclick="this.classList.toggle('selected')"
+              >
+                <span class="ic-emoji">🧘</span> Wellness
+              </div>
+              <div
+                class="interest-chip"
+                onclick="this.classList.toggle('selected')"
+              >
+                <span class="ic-emoji">🌿</span> Nature
+              </div>
+              <div
+                class="interest-chip"
+                onclick="this.classList.toggle('selected')"
+              >
+                <span class="ic-emoji">🎵</span> Nightlife
+              </div>
+              <div
+                class="interest-chip"
+                onclick="this.classList.toggle('selected')"
+              >
+                <span class="ic-emoji">🚴</span> Cycling
+              </div>
+              <div
+                class="interest-chip"
+                onclick="this.classList.toggle('selected')"
+              >
+                <span class="ic-emoji">🤿</span> Water Sports
+              </div>
+            </div>
+            <div class="step-nav">
+              <button class="btn-step-back" onclick="nextStep(1)">
+                ← Back
+              </button>
+              <button class="btn-step-next" onclick="nextStep(3)">
+                Next: Preferences →
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 4 -->
+          <div class="planner-step" id="step-3">
+            <div class="step-title">Final touches</div>
+            <div class="step-subtitle">Any special requirements or notes?</div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Accommodation Type</label>
+                <select class="form-select" id="accommodation-select">
+                  <option>Hostel / Dorm</option>
+                  <option selected>Hotel (3 Star)</option>
+                  <option>Hotel (4–5 Star)</option>
+                  <option>Resort</option>
+                  <option>Homestay / Airbnb</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Transport Preference</label>
+                <select class="form-select" id="transport-select">
+                  <option>Budget (Bus/Train)</option>
+                  <option selected>Mixed</option>
+                  <option>Flight + Cab + Train + Bus</option>
+                  <option>Self Drive</option>
+                </select>
+              </div>
+              <div class="form-group full">
+                <label class="form-label">Special Requirements</label>
+                <textarea
+                  class="form-textarea"
+                  id="special-requirements-input"
+                  placeholder="e.g. Vegetarian food, wheelchair accessible, travelling with kids..."
+                ></textarea>
+              </div>
+            </div>
+            <div class="step-nav">
+              <button class="btn-step-back" onclick="nextStep(2)">
+                ← Back
+              </button>
+              <button
+                class="btn-step-next"
+                onclick="generateItinerary()"
+                style="background: var(--forest)"
+              >
+                🗺️ Generate Itinerary
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================== ITINERARY PAGE ======================== -->
+    <div id="page-itinerary" class="page">
+      <div class="itin-header">
+        <div class="itin-header-inner">
+          <div>
+            <div class="itin-dest">✦ GOA, INDIA — DEC 2025</div>
+            <h1 class="itin-title">5 Days in Goa</h1>
+            <div class="itin-meta">
+              <div class="itin-badge">📅 Dec 20 – 26</div>
+              <div class="itin-badge">👥 2 Travellers</div>
+              <div class="itin-badge">💰 ₹38,500 est.</div>
+              <div class="itin-badge">🌤️ 28°C avg</div>
+            </div>
+          </div>
+          <button
+            class="itin-share-btn"
+            onclick="showToast('📋 Itinerary link copied to clipboard!')"
+          >
+            Share Trip ↗
+          </button>
+        </div>
+      </div>
+
+      <div class="itin-body">
+        <div class="itin-days">
+          <!-- Day 1 -->
+          <div class="day-card">
+            <div class="day-header" onclick="toggleDay(this)">
+              <div>
+                <div class="day-num">Day 1 — Arrival & South Goa</div>
+                <div class="day-date">Saturday, 20 December 2025</div>
+              </div>
+              <div class="day-toggle">⌄</div>
+            </div>
+            <div class="day-body open">
+              <div class="timeline">
+                <div class="tl-item">
+                  <div class="tl-time">09:00 AM</div>
+                  <div class="tl-dot-col">
+                    <div class="tl-dot"></div>
+                    <div class="tl-line"></div>
+                  </div>
+                  <div class="tl-content">
+                    <div class="tl-title">Arrive at Goa Airport (GOI)</div>
+                    <div class="tl-desc">
+                      Flight from Lucknow. Pre-book cab to hotel — Ola/Uber
+                      available outside arrivals.
+                    </div>
+                    <span class="tl-chip chip-travel">✈️ Travel</span>
+                  </div>
+                </div>
+                <div class="tl-item">
+                  <div class="tl-time">11:30 AM</div>
+                  <div class="tl-dot-col">
+                    <div class="tl-dot"></div>
+                    <div class="tl-line"></div>
+                  </div>
+                  <div class="tl-content">
+                    <div class="tl-title">
+                      Check-in: Treehouse Boutique Hotel, Colva
+                    </div>
+                    <div class="tl-desc">
+                      ₹2,800/night. Beach-facing rooms, free breakfast included.
+                    </div>
+                    <span class="tl-chip chip-hotel">🏨 Hotel</span>
+                  </div>
+                </div>
+                <div class="tl-item">
+                  <div class="tl-time">01:00 PM</div>
+                  <div class="tl-dot-col">
+                    <div class="tl-dot"></div>
+                    <div class="tl-line"></div>
+                  </div>
+                  <div class="tl-content">
+                    <div class="tl-title">Lunch at Martin's Corner</div>
+                    <div class="tl-desc">
+                      Famous Goan seafood restaurant. Try prawn curry rice &
+                      fish thali. ~₹600 for two.
+                    </div>
+                    <span class="tl-chip chip-food">🍽️ Food</span>
+                  </div>
+                </div>
+                <div class="tl-item">
+                  <div class="tl-time">03:30 PM</div>
+                  <div class="tl-dot-col">
+                    <div class="tl-dot"></div>
+                    <div class="tl-line"></div>
+                  </div>
+                  <div class="tl-content">
+                    <div class="tl-title">Colva Beach & Sunset Walk</div>
+                    <div class="tl-desc">
+                      2 km of uncrowded white sand. Best beach photography spot.
+                      Golden hour starts 6:00 PM.
+                    </div>
+                    <span class="tl-chip chip-sight">📸 Sightseeing</span>
+                  </div>
+                </div>
+                <div class="tl-item">
+                  <div class="tl-time">08:00 PM</div>
+                  <div class="tl-dot-col">
+                    <div class="tl-dot"></div>
+                    <div class="tl-line"></div>
+                  </div>
+                  <div class="tl-content">
+                    <div class="tl-title">Dinner at Zeebop by the Sea</div>
+                    <div class="tl-desc">
+                      Beachside shack, live music, fresh catches grilled to
+                      order. ~₹900 for two.
+                    </div>
+                    <span class="tl-chip chip-food">🍽️ Food</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Day 2 -->
+          <div class="day-card">
+            <div class="day-header" onclick="toggleDay(this)">
+              <div>
+                <div class="day-num">Day 2 — Heritage & Old Goa</div>
+                <div class="day-date">Sunday, 21 December 2025</div>
+              </div>
+              <div class="day-toggle">⌄</div>
+            </div>
+            <div class="day-body">
+              <div class="timeline">
+                <div class="tl-item">
+                  <div class="tl-time">09:00 AM</div>
+                  <div class="tl-dot-col">
+                    <div class="tl-dot"></div>
+                    <div class="tl-line"></div>
+                  </div>
+                  <div class="tl-content">
+                    <div class="tl-title">Basilica of Bom Jesus</div>
+                    <div class="tl-desc">
+                      UNESCO World Heritage Site. Houses the mortal remains of
+                      St. Francis Xavier. Free entry.
+                    </div>
+                    <span class="tl-chip chip-sight">🏛️ Heritage</span>
+                  </div>
+                </div>
+                <div class="tl-item">
+                  <div class="tl-time">11:00 AM</div>
+                  <div class="tl-dot-col">
+                    <div class="tl-dot"></div>
+                    <div class="tl-line"></div>
+                  </div>
+                  <div class="tl-content">
+                    <div class="tl-title">
+                      Se Cathedral & Old Goa Churches Trail
+                    </div>
+                    <div class="tl-desc">
+                      Largest church in Asia. Walk between 5 churches — takes
+                      about 90 minutes. Bring water.
+                    </div>
+                    <span class="tl-chip chip-sight">🏛️ Heritage</span>
+                  </div>
+                </div>
+                <div class="tl-item">
+                  <div class="tl-time">01:30 PM</div>
+                  <div class="tl-dot-col">
+                    <div class="tl-dot"></div>
+                    <div class="tl-line"></div>
+                  </div>
+                  <div class="tl-content">
+                    <div class="tl-title">Lunch at Viva Panjim</div>
+                    <div class="tl-desc">
+                      Panjim's most charming restaurant, in a 200-year-old
+                      house. Authentic Goan home cooking.
+                    </div>
+                    <span class="tl-chip chip-food">🍽️ Food</span>
+                  </div>
+                </div>
+                <div class="tl-item">
+                  <div class="tl-time">03:30 PM</div>
+                  <div class="tl-dot-col">
+                    <div class="tl-dot"></div>
+                    <div class="tl-line"></div>
+                  </div>
+                  <div class="tl-content">
+                    <div class="tl-title">Fontainhas Latin Quarter Walk</div>
+                    <div class="tl-desc">
+                      Goa's Portuguese heritage village. Colourful tile facades,
+                      cafés, local art galleries.
+                    </div>
+                    <span class="tl-chip chip-sight">📸 Sightseeing</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Day 3 -->
+          <div class="day-card">
+            <div class="day-header" onclick="toggleDay(this)">
+              <div>
+                <div class="day-num">Day 3 — North Goa Party Scene</div>
+                <div class="day-date">Monday, 22 December 2025</div>
+              </div>
+              <div class="day-toggle">⌄</div>
+            </div>
+            <div class="day-body">
+              <div class="timeline">
+                <div class="tl-item">
+                  <div class="tl-time">10:00 AM</div>
+                  <div class="tl-dot-col">
+                    <div class="tl-dot"></div>
+                    <div class="tl-line"></div>
+                  </div>
+                  <div class="tl-content">
+                    <div class="tl-title">Calangute & Baga Beach</div>
+                    <div class="tl-desc">
+                      Most popular stretch. Parasailing (~₹800), jet-ski rides,
+                      beach shopping. Arrive early for spots.
+                    </div>
+                    <span class="tl-chip chip-sight">🏖️ Beach</span>
+                  </div>
+                </div>
+                <div class="tl-item">
+                  <div class="tl-time">07:00 PM</div>
+                  <div class="tl-dot-col">
+                    <div class="tl-dot"></div>
+                    <div class="tl-line"></div>
+                  </div>
+                  <div class="tl-content">
+                    <div class="tl-title">Tito's Lane, Baga</div>
+                    <div class="tl-desc">
+                      Goa's most famous nightlife strip. Mix of shacks, clubs &
+                      live music. Cover ~₹500/person.
+                    </div>
+                    <span class="tl-chip chip-sight">🎵 Nightlife</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Days 4 & 5 collapsed -->
+          <div class="day-card">
+            <div class="day-header" onclick="toggleDay(this)">
+              <div>
+                <div class="day-num">Day 4 — Dudhsagar Falls & Spice Farm</div>
+                <div class="day-date">Tuesday, 23 December 2025</div>
+              </div>
+              <div class="day-toggle">⌄</div>
+            </div>
+            <div class="day-body">
+              <div class="timeline">
+                <div class="tl-item">
+                  <div class="tl-time">07:00 AM</div>
+                  <div class="tl-dot-col">
+                    <div class="tl-dot"></div>
+                    <div class="tl-line"></div>
+                  </div>
+                  <div class="tl-content">
+                    <div class="tl-title">Dudhsagar Waterfall Day Trip</div>
+                    <div class="tl-desc">
+                      3-hour jeep ride into Western Ghats. 310m-tall four-tiered
+                      waterfall. Pack rain gear. ~₹1,200/person.
+                    </div>
+                    <span class="tl-chip chip-sight">🌿 Nature</span>
+                  </div>
+                </div>
+                <div class="tl-item">
+                  <div class="tl-time">03:00 PM</div>
+                  <div class="tl-dot-col">
+                    <div class="tl-dot"></div>
+                    <div class="tl-line"></div>
+                  </div>
+                  <div class="tl-content">
+                    <div class="tl-title">Savoi Spice Plantation Tour</div>
+                    <div class="tl-desc">
+                      Walking tour through vanilla, nutmeg, cardamom. Includes
+                      traditional Goan lunch. ~₹600/person.
+                    </div>
+                    <span class="tl-chip chip-sight">🌿 Experience</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="day-card">
+            <div class="day-header" onclick="toggleDay(this)">
+              <div>
+                <div class="day-num">Day 5 — Departure Day</div>
+                <div class="day-date">Wednesday, 13 January 2026</div>
+              </div>
+              <div class="day-toggle">⌄</div>
+            </div>
+            <div class="day-body">
+              <div class="timeline">
+                <div class="tl-item">
+                  <div class="tl-time">09:00 AM</div>
+                  <div class="tl-dot-col">
+                    <div class="tl-dot"></div>
+                    <div class="tl-line"></div>
+                  </div>
+                  <div class="tl-content">
+                    <div class="tl-title">Last Morning at Palolem Beach</div>
+                    <div class="tl-desc">
+                      Crescent-shaped paradise, perfect for a quiet goodbye.
+                      Rent a kayak (₹300/hr).
+                    </div>
+                    <span class="tl-chip chip-sight">🏖️ Beach</span>
+                  </div>
+                </div>
+                <div class="tl-item">
+                  <div class="tl-time">12:00 PM</div>
+                  <div class="tl-dot-col">
+                    <div class="tl-dot"></div>
+                    <div class="tl-line"></div>
+                  </div>
+                  <div class="tl-content">
+                    <div class="tl-title">Check-out & Head to Airport</div>
+                    <div class="tl-desc">
+                      Evening flight back. Grab Bebinca (Goan cake) as a
+                      souvenir from the airport bakery.
+                    </div>
+                    <span class="tl-chip chip-travel">✈️ Departure</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="itin-sidebar">
+          <div class="side-card">
+            <h3>Cost Breakdown</h3>
+            <div class="cost-row">
+              <span>🚗Train (2 pax)</span><span>₹1000</span>
+            </div>
+            <div class="cost-row">
+              <span>✈️ Flights (2 pax)</span><span>₹12,000</span>
+            </div>
+            <div class="cost-row">
+              <span>🏨 Hotel (4 nights)</span><span>₹11,200</span>
+            </div>
+            <div class="cost-row">
+              <span>🍽️ Food & Dining</span><span>₹6,500</span>
+            </div>
+            <div class="cost-row">
+              <span>🚗 Local Transport</span><span>₹3,800</span>
+            </div>
+            <div class="cost-row">
+              <span>🎭 Activities</span><span>₹4,000</span>
+            </div>
+            <div class="cost-row">
+              <span>🛍️ Shopping (est.)</span><span>₹2,000</span>
+            </div>
+            <div class="cost-row">
+              <span><strong>Total Estimate</strong></span
+              ><span>₹39,500</span>
+            </div>
+          </div>
+          <div class="side-card">
+            <h3>Weather Forecast</h3>
+            <div class="weather-grid">
+              <div class="weather-day">
+                <span class="weather-icon">☀️</span>
+                <div class="weather-temp">29°C</div>
+                <div class="weather-label">Dec 20</div>
+              </div>
+              <div class="weather-day">
+                <span class="weather-icon">⛅</span>
+                <div class="weather-temp">27°C</div>
+                <div class="weather-label">Dec 21</div>
+              </div>
+              <div class="weather-day">
+                <span class="weather-icon">☀️</span>
+                <div class="weather-temp">30°C</div>
+                <div class="weather-label">Dec 22</div>
+              </div>
+              <div class="weather-day">
+                <span class="weather-icon">🌦️</span>
+                <div class="weather-temp">26°C</div>
+                <div class="weather-label">Dec 23</div>
+              </div>
+              <div class="weather-day">
+                <span class="weather-icon">☀️</span>
+                <div class="weather-temp">29°C</div>
+                <div class="weather-label">Dec 24</div>
+              </div>
+              <div class="weather-day">
+                <span class="weather-icon">⛅</span>
+                <div class="weather-temp">28°C</div>
+                <div class="weather-label">Dec 25</div>
+              </div>
+            </div>
+          </div>
+          <div class="side-card">
+            <h3>Travel Tips</h3>
+            <ul class="tips-list">
+              <li>
+                <span class="tip-dot">·</span> Rent a scooter for ₹300/day —
+                best way to get around North Goa
+              </li>
+              <li>
+                <span class="tip-dot">·</span> Avoid peak-hour beach vendors —
+                walk 500m from main entry for better prices
+              </li>
+              <li>
+                <span class="tip-dot">·</span> Book Dudhsagar day trip 2 days in
+                advance — spots fill up fast in Dec
+              </li>
+              <li>
+                <span class="tip-dot">·</span> Carry cash — many beach shacks
+                don't accept UPI
+              </li>
+              <li>
+                <span class="tip-dot">·</span> Best swimming beaches: Palolem,
+                Agonda, Morjim
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================== DISCOVER PAGE ======================== -->
+    <div id="page-discover" class="page">
+      <div class="discover-header">
+        <h1>Discover Places</h1>
+        <p style="color: rgba(255, 255, 255, 0.6); font-size: 16px">
+          Explore handpicked destinations, hidden gems & trending spots
+        </p>
+        <div class="discover-search">
+          <input
+            type="text"
+            class="search-input"
+            placeholder="Search destinations, cities, experiences..."
+          />
+          <button
+            class="search-btn"
+            onclick="showToast('🔍 Searching destinations...')"
+          >
+            Search
+          </button>
+        </div>
+      </div>
+      <div class="discover-body">
+        <div class="filter-bar">
+          <button class="filt-btn active">🌍 All</button>
+          <button class="filt-btn" onclick="activateFilter(this)">
+            🏖️ Beaches
+          </button>
+          <button class="filt-btn" onclick="activateFilter(this)">
+            🏔️ Mountains
+          </button>
+          <button class="filt-btn" onclick="activateFilter(this)">
+            🏙️ Cities
+          </button>
+          <button class="filt-btn" onclick="activateFilter(this)">
+            🏛️ Heritage
+          </button>
+          <button class="filt-btn" onclick="activateFilter(this)">
+            🌿 Nature
+          </button>
+          <button class="filt-btn" onclick="activateFilter(this)">
+            🧘 Wellness
+          </button>
+          <button class="filt-btn" onclick="activateFilter(this)">
+            🍜 Food Tours
+          </button>
+        </div>
+        <div class="places-grid">
+          <div class="place-card">
+            <div class="place-thumb dest-bg-1">
+              🏯
+              <div class="place-thumb-overlay"></div>
+              <div class="place-rating">⭐ 4.9</div>
+            </div>
+            <div class="place-body">
+              <div class="place-name">Kyoto, Japan</div>
+              <div class="place-loc">📍 Kansai Region, Japan</div>
+              <div class="place-tags">
+                <span class="place-tag">Heritage</span
+                ><span class="place-tag">Culture</span
+                ><span class="place-tag">Food</span>
+              </div>
+              <div class="place-footer">
+                <div class="place-price">From <strong>₹85,000</strong></div>
+                <button
+                  class="add-trip-btn"
+                  onclick="showToast('✅ Kyoto added to your trip list!')"
+                >
+                  + Add to Trip
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="place-card">
+            <div class="place-thumb dest-bg-3">
+              🌴
+              <div class="place-thumb-overlay"></div>
+              <div class="place-rating">⭐ 4.8</div>
+            </div>
+            <div class="place-body">
+              <div class="place-name">Bali, Indonesia</div>
+              <div class="place-loc">📍 Island of the Gods</div>
+              <div class="place-tags">
+                <span class="place-tag">Beaches</span
+                ><span class="place-tag">Temples</span
+                ><span class="place-tag">Wellness</span>
+              </div>
+              <div class="place-footer">
+                <div class="place-price">From <strong>₹45,000</strong></div>
+                <button
+                  class="add-trip-btn"
+                  onclick="showToast('✅ Bali added to your trip list!')"
+                >
+                  + Add to Trip
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="place-card">
+            <div
+              class="place-thumb"
+              style="background: linear-gradient(135deg, #c8a882, #2d5016)"
+            >
+              🏔️
+              <div class="place-thumb-overlay"></div>
+              <div class="place-rating">⭐ 4.9</div>
+            </div>
+            <div class="place-body">
+              <div class="place-name">Leh–Ladakh, India</div>
+              <div class="place-loc">📍 Jammu & Kashmir, India</div>
+              <div class="place-tags">
+                <span class="place-tag">Mountains</span
+                ><span class="place-tag">Adventure</span
+                ><span class="place-tag">Monasteries</span>
+              </div>
+              <div class="place-footer">
+                <div class="place-price">From <strong>₹22,000</strong></div>
+                <button
+                  class="add-trip-btn"
+                  onclick="showToast('✅ Ladakh added to your trip list!')"
+                >
+                  + Add to Trip
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="place-card">
+            <div
+              class="place-thumb"
+              style="background: linear-gradient(135deg, #e8b86d, #c4623a)"
+            >
+              🏜️
+              <div class="place-thumb-overlay"></div>
+              <div class="place-rating">⭐ 4.7</div>
+            </div>
+            <div class="place-body">
+              <div class="place-name">Jaisalmer, India</div>
+              <div class="place-loc">📍 Rajasthan, India</div>
+              <div class="place-tags">
+                <span class="place-tag">Desert</span
+                ><span class="place-tag">Heritage</span
+                ><span class="place-tag">Culture</span>
+              </div>
+              <div class="place-footer">
+                <div class="place-price">From <strong>₹15,000</strong></div>
+                <button
+                  class="add-trip-btn"
+                  onclick="showToast('✅ Jaisalmer added to your trip list!')"
+                >
+                  + Add to Trip
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="place-card">
+            <div class="place-thumb dest-bg-2">
+              🗼
+              <div class="place-thumb-overlay"></div>
+              <div class="place-rating">⭐ 4.8</div>
+            </div>
+            <div class="place-body">
+              <div class="place-name">Paris, France</div>
+              <div class="place-loc">📍 Île-de-France, France</div>
+              <div class="place-tags">
+                <span class="place-tag">Romance</span
+                ><span class="place-tag">Art</span
+                ><span class="place-tag">Food</span>
+              </div>
+              <div class="place-footer">
+                <div class="place-price">From <strong>₹1,20,000</strong></div>
+                <button
+                  class="add-trip-btn"
+                  onclick="showToast('✅ Paris added to your trip list!')"
+                >
+                  + Add to Trip
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="place-card">
+            <div
+              class="place-thumb"
+              style="background: linear-gradient(135deg, #0f3460, #c4623a)"
+            >
+              🌊
+              <div class="place-thumb-overlay"></div>
+              <div class="place-rating">⭐ 4.6</div>
+            </div>
+            <div class="place-body">
+              <div class="place-name">Andaman Islands</div>
+              <div class="place-loc">📍 Bay of Bengal, India</div>
+              <div class="place-tags">
+                <span class="place-tag">Beaches</span
+                ><span class="place-tag">Snorkeling</span
+                ><span class="place-tag">Island</span>
+              </div>
+              <div class="place-footer">
+                <div class="place-price">From <strong>₹30,000</strong></div>
+                <button
+                  class="add-trip-btn"
+                  onclick="showToast('✅ Andaman added to your trip list!')"
+                >
+                  + Add to Trip
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================== AUTH PAGE ======================== -->
+    <div id="page-auth" class="page">
+      <div class="auth-page">
+        <div class="auth-left">
+          <div class="auth-left-content">
+            <div class="auth-left-logo">✈️ <span>Wanderlust</span></div>
+            <div class="auth-tagline">
+              Your world,<br /><em>perfectly planned.</em>
+            </div>
+            <p>
+              Join thousands of travellers who've discovered smarter, cheaper,
+              more memorable trips with Wanderlust.
+            </p>
+            <div
+              style="
+                margin-top: 32px;
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+              "
+            >
+              <div
+                style="
+                  display: flex;
+                  gap: 10px;
+                  align-items: center;
+                  color: rgba(255, 255, 255, 0.7);
+                  font-size: 14px;
+                "
+              >
+                <span style="color: var(--gold)">✓</span> Save unlimited trip
+                itineraries
+              </div>
+              <div
+                style="
+                  display: flex;
+                  gap: 10px;
+                  align-items: center;
+                  color: rgba(255, 255, 255, 0.7);
+                  font-size: 14px;
+                "
+              >
+                <span style="color: var(--gold)">✓</span> AI-personalised
+                recommendations
+              </div>
+              <div
+                style="
+                  display: flex;
+                  gap: 10px;
+                  align-items: center;
+                  color: rgba(255, 255, 255, 0.7);
+                  font-size: 14px;
+                "
+              >
+                <span style="color: var(--gold)">✓</span> Share trips with
+                friends
+              </div>
+              <div
+                style="
+                  display: flex;
+                  gap: 10px;
+                  align-items: center;
+                  color: rgba(255, 255, 255, 0.7);
+                  font-size: 14px;
+                "
+              >
+                <span style="color: var(--gold)">✓</span> Track trip expenses
+                easily
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="auth-right">
+          <div class="auth-form-wrap">
+            <div class="auth-tabs">
+              <button class="auth-tab active" onclick="switchAuth('login')">
+                Sign In
+              </button>
+              <button class="auth-tab" onclick="switchAuth('register')">
+                Create Account
+              </button>
+            </div>
+
+            <div class="auth-form active" id="auth-login">
+              <h2>Welcome back</h2>
+              <p>Sign in to access your trips and preferences</p>
+              <div class="auth-field">
+                <label>Email</label
+                ><input type="email" placeholder="you@example.com" />
+              </div>
+              <div class="auth-field">
+                <label>Password</label
+                ><input type="password" placeholder="••••••••" />
+              </div>
+              <button class="auth-submit" onclick="loginUser()">
+                Sign In →
+              </button>
+              <div class="auth-divider">or continue with</div>
+              <button
+                class="social-btn"
+                onclick="showToast('🔗 Google login coming soon!')"
+              >
+                🌐 &nbsp;Continue with Google
+              </button>
+            </div>
+
+            <div class="auth-form" id="auth-register">
+              <h2>Start exploring</h2>
+              <p>Create your free account in 30 seconds</p>
+              <div class="auth-field">
+                <label>Full Name</label
+                ><input type="text" placeholder="Your name" />
+              </div>
+              <div class="auth-field">
+                <label>Email</label
+                ><input type="email" placeholder="you@example.com" />
+              </div>
+              <div class="auth-field">
+                <label>Password</label
+                ><input type="password" placeholder="Min. 8 characters" />
+              </div>
+              <button class="auth-submit" onclick="registerUser()">
+                Create Account →
+              </button>
+              <div class="auth-divider">or continue with</div>
+              <button
+                class="social-btn"
+                onclick="showToast('🔗 Google signup coming soon!')"
+              >
+                🌐 &nbsp;Sign up with Google
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+      window.WANDERLUST_CONFIG = window.WANDERLUST_CONFIG || {
+        googleMapsApiKey: "AIzaSyD7DYtq9tE1qmHb5GMvvCg1fvzSmVzwCdM"
+      };
+    </script>
+    <script src="script.js"></script>
+  </body>
+</html>
